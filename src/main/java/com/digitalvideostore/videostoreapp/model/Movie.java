@@ -3,13 +3,12 @@ package com.digitalvideostore.videostoreapp.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "media")
-public class Media {
+@Document(collection = "movies")
+public class Movie {
     @Id
     private String id;
     private String title;
     private String synopsis;
-    private String category; // movie or tvshow
     private double rentPrice;
     private double buyPrice;
     private boolean featured;
@@ -39,14 +38,6 @@ public class Media {
 
     public void setSynopsis(String synopsis) {
         this.synopsis = synopsis;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
     }
 
     public double getRentPrice() {

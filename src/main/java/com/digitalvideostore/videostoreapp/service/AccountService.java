@@ -3,7 +3,7 @@ package com.digitalvideostore.videostoreapp.service;
 import com.digitalvideostore.videostoreapp.model.User;
 import com.digitalvideostore.videostoreapp.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -14,20 +14,19 @@ public class AccountService {
     @Autowired
     private UserRepo repo;
 
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    public User createAccount(User inputUser) {
-        String hashed = passwordEncoder.encode(inputUser.getPassword());
-        inputUser.setPassword(hashed);
-        return repo.save(inputUser);
+    public User createAccount(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword())); // Encrypt password before saving
+        return repo.save(user);
     }
 
-    public boolean validateLogin(String email, String plainPassword) {
-        Optional<User> user = repo.findByEmail(email);
-        return user.isPresent() && passwordEncoder.matches(plainPassword, user.get().getPassword());
+    public Optional<User> getUserByEmail(String email) {
+        return repo.findByEmail(email);
     }
 
-    public Optional<User> fetchUser(String id) {
-        return repo.findById(id);
+    public Optional<User> fetchUser(String userId) {
+        return repo.findById(userId);
     }
 }
