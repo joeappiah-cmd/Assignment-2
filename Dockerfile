@@ -1,25 +1,14 @@
-# Stage 1: Build with Maven
-FROM maven:3.9.4-eclipse-temurin-24-alpine
- 
+# Stage 1: Build
+FROM maven:3.9.9-eclipse-temurin-17-alpine AS builder
 WORKDIR /app
- 
-# Copy pom.xml and source code into the container
 COPY pom.xml .
+RUN mvn dependency:go-offline -DskipTests
 COPY src ./src
- 
-# Run Maven to build the application (skip tests for now)
-RUN mvn clean install -DskipTests
- 
-# Stage 2: Run with JDK
-FROM openjdk:25-jdk-slim
- 
+RUN mvn package -DskipTests -Dmaven.repo.local=/root/.m2/repository
+
+# Stage 2: Run
+FROM openjdk:17-jdk-slim
 WORKDIR /app
- 
-# Copy the generated JAR file from the build stage
 COPY --from=builder /app/target/*.jar app.jar
- 
-# Expose the port that Spring Boot app is running on
 EXPOSE 8080
- 
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "app.jar"]
